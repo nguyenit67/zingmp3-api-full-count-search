@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { searchSongs } from "../src";
 
 dotenv.config();
@@ -7,7 +8,8 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || "8080";
 
-app.get("/search-songs", (req, res) => {
+// @ts-ignore
+app.get("/search-songs", cors(), (req, res) => {
   const { keyword, page, count } = req.query;
   searchSongs(keyword, page, count).then((data) => res.json(data));
 });
