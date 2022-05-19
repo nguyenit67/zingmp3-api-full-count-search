@@ -60,6 +60,28 @@ const hashParamMV = (
   }
 };
 
+const hashParamSongSearch = (
+  path: string,
+  type: string,
+  page: void,
+  count: void
+) => {
+  if (count == undefined && page == undefined) {
+    return getHmac512(
+      path + getHash256(`ctime=${CTIME}type=${type}version=${VERSION}`),
+      SECRET_KEY
+    );
+  } else {
+    return getHmac512(
+      path +
+        getHash256(
+          `count=${count}ctime=${CTIME}page=${page}type=${type}version=${VERSION}`
+        ),
+      SECRET_KEY
+    );
+  }
+};
+
 const getCookie = async () => {
   try {
     let res = await axios.get(`${URL}`);
@@ -94,6 +116,20 @@ const requestZingMp3 = async (path: string, qs: object) => {
   } catch (err) {
     console.error(err);
   }
+};
+
+// @ts-ignore
+export const searchSongs = async (keyword, page, count) => {
+  const url = "/api/v2/search";
+
+  return await requestZingMp3(url, {
+    q: keyword,
+    type: "song",
+    page,
+    count,
+    // @ts-ignore
+    sig: hashParamSongSearch(url, "song", page, count),
+  });
 };
 
 export const getSong = async (songId: void) => {
@@ -203,5 +239,5 @@ export default {
   search,
   getListMV,
   getCategoryMV,
-  getVideo
+  getVideo,
 };
